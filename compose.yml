@@ -1,0 +1,13 @@
+services:
+  postgres:
+    container_name: planner-postgres
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: planner-db
+      PGDATA: /data/postgres
+    volumes:
+      - ./data/db:/data/postgres

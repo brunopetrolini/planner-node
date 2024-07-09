@@ -1,0 +1,32 @@
+{
+  "name": "planner-api",
+  "version": "1.0.0",
+  "description": "A travel planner",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brunopetrolini/planner-node.git"
+  },
+  "author": "Bruno Petrolini <brunopetrolini@hotmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brunopetrolini/planner-node/issues"
+  },
+  "homepage": "https://github.com/brunopetrolini/planner-node#readme",
+  "devDependencies": {
+    "@rocketseat/eslint-config": "^2.2.2",
+    "@types/node": "^20.14.10",
+    "eslint": "^8.57.0",
+    "prisma": "^5.16.1",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.16.1",
+    "fastify": "^4.28.1"
+  }
+}
