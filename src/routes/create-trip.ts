@@ -1,16 +1,10 @@
-import 'dayjs/locale/pt-br'
-
-import dayjs from 'dayjs'
-import localizedFormat from 'dayjs/plugin/localizedFormat'
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 import nodemailer from 'nodemailer'
 
 import { prisma } from '../lib/prisma'
 import { getMailClient } from '../lib/mail'
-
-dayjs.locale('pt-br')
-dayjs.extend(localizedFormat)
+import { dayjs } from '../lib/dayjs'
 
 const createTripSchema = z.object({
   destination: z.string().min(4),
