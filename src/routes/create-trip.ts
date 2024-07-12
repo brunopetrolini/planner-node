@@ -12,12 +12,19 @@ const createTripSchema = z.object({
   endsAt: z.coerce.date(),
   ownerName: z.string(),
   ownerEmail: z.string().email(),
+  emailsToInvite: z.array(z.string().email()),
 })
 
 export async function createTrip(app: FastifyInstance) {
   app.post('/trips', async (request: FastifyRequest, reply: FastifyReply) => {
-    const { destination, startsAt, endsAt, ownerName, ownerEmail } =
-      createTripSchema.parse(request.body)
+    const {
+      destination,
+      startsAt,
+      endsAt,
+      ownerName,
+      ownerEmail,
+      emailsToInvite,
+    } = createTripSchema.parse(request.body)
 
     const isStartsDateBeforeNow = dayjs(startsAt).isBefore(dayjs())
     if (isStartsDateBeforeNow) {
@@ -30,7 +37,24 @@ export async function createTrip(app: FastifyInstance) {
     }
 
     const trip = await prisma.trip.create({
-      data: { destination, startsAt, endsAt },
+      data: {
+        destination,
+        startsAt,
+        endsAt,
+        participants: {
+          createMany: {
+            data: [
+              {
+                name: ownerName,
+                email: ownerEmail,
+                isOwner: true,
+                isConfirmed: true,
+              },
+              ...emailsToInvite.map((email) => ({ email })),
+            ],
+          },
+        },
+      },
     })
 
     const mail = await getMailClient()
