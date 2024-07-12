@@ -1,10 +1,10 @@
 import fastify from 'fastify'
 
+import { createTrip } from './routes/create-trip'
+
 const app = fastify()
 
-app.get('/health', () => {
-  return { status: 'ok' }
-})
+app.register(createTrip)
 
 app
   .listen({ port: 3030 })
