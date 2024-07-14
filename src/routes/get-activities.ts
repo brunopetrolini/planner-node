@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { prisma } from '../lib/prisma'
 import { dayjs } from '../lib/dayjs'
 
-const createActivityParamsSchema = z.object({
+const getActivitiesParamsSchema = z.object({
   tripId: z.string().uuid(),
 })
 
@@ -12,7 +12,7 @@ export async function getActivities(app: FastifyInstance) {
   app.get(
     '/trips/:tripId/activities',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { tripId } = createActivityParamsSchema.parse(request.params)
+      const { tripId } = getActivitiesParamsSchema.parse(request.params)
 
       const trip = await prisma.trip.findUnique({
         where: { id: tripId },
