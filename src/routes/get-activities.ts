@@ -7,7 +7,7 @@ const createActivityParamsSchema = z.object({
   tripId: z.string().uuid(),
 })
 
-export async function createActivity(app: FastifyInstance) {
+export async function getActivities(app: FastifyInstance) {
   app.get(
     '/trips/:tripId/activities',
     async (request: FastifyRequest, reply: FastifyReply) => {
