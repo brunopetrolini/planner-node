@@ -1,10 +1,10 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
-import { z } from 'zod'
 import nodemailer from 'nodemailer'
+import { z } from 'zod'
 
-import { prisma } from '../lib/prisma'
-import { getMailClient } from '../lib/mail'
-import { dayjs } from '../lib/dayjs'
+import { env } from '../../env'
+import { NotFoundError } from '../../errors'
+import { dayjs, getMailClient, prisma } from '../../lib'
 
 const confirmTripParamsSchema = z.object({
   tripId: z.string().uuid(),
@@ -26,11 +26,11 @@ export async function confirmTrip(app: FastifyInstance) {
       })
 
       if (!trip) {
-        return reply.status(404).send({ error: 'Trip not found.' })
+        throw new NotFoundError('Trip not found.')
       }
 
       if (trip.isConfirmed) {
-        return reply.redirect(`http://localhost:3000/trips/${tripId}`)
+        return reply.redirect(`${env.WEB_BASE_URL}/trips/${tripId}`)
       }
 
       await prisma.trip.update({
@@ -45,7 +45,7 @@ export async function confirmTrip(app: FastifyInstance) {
 
       await Promise.all(
         trip.participants.map(async (participant) => {
-          const confirmationLink = `http://localhost:3030/participants/${participant.id}/confirm`
+          const confirmationLink = `${env.API_BASE_URL}/participants/${participant.id}/confirm`
 
           const message = await mail.sendMail({
             from: {
@@ -73,7 +73,7 @@ export async function confirmTrip(app: FastifyInstance) {
         }),
       )
 
-      return reply.redirect(`http://localhost:3000/trips/${tripId}`)
+      return reply.redirect(`${env.WEB_BASE_URL}/trips/${tripId}`)
     },
   )
 }

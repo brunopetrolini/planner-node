@@ -1,7 +1,9 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-import { prisma } from '../lib/prisma'
+import { env } from '../../env'
+import { NotFoundError } from '../../errors'
+import { prisma } from '../../lib'
 
 const confirmParticipantParamsSchema = z.object({
   participantId: z.string().uuid(),
@@ -21,13 +23,11 @@ export async function confirmParticipant(app: FastifyInstance) {
       })
 
       if (!participant) {
-        return reply.status(404).send({ error: 'Participant not found.' })
+        throw new NotFoundError('Participant not found.')
       }
 
       if (participant.isConfirmed) {
-        return reply.redirect(
-          `http://localhost:3000/trips/${participant.tripId}`,
-        )
+        return reply.redirect(`${env.WEB_BASE_URL}/trips/${participant.tripId}`)
       }
 
       await prisma.participant.update({
@@ -35,7 +35,7 @@ export async function confirmParticipant(app: FastifyInstance) {
         data: { isConfirmed: true },
       })
 
-      return reply.redirect(`http://localhost:3000/trips/${participant.tripId}`)
+      return reply.redirect(`${env.WEB_BASE_URL}/trips/${participant.tripId}`)
     },
   )
 }

@@ -1,10 +1,10 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
-import { z } from 'zod'
+import type { FastifyInstance, FastifyRequest } from 'fastify'
 import nodemailer from 'nodemailer'
+import { z } from 'zod'
 
-import { prisma } from '../lib/prisma'
-import { getMailClient } from '../lib/mail'
-import { dayjs } from '../lib/dayjs'
+import { env } from '../../env'
+import { ClientError } from '../../errors'
+import { dayjs, getMailClient, prisma } from '../../lib'
 
 const createTripSchema = z.object({
   destination: z.string().min(4),
@@ -16,7 +16,7 @@ const createTripSchema = z.object({
 })
 
 export async function createTrip(app: FastifyInstance) {
-  app.post('/trips', async (request: FastifyRequest, reply: FastifyReply) => {
+  app.post('/trips', async (request: FastifyRequest) => {
     const {
       destination,
       startsAt,
@@ -28,12 +28,12 @@ export async function createTrip(app: FastifyInstance) {
 
     const isStartsDateBeforeNow = dayjs(startsAt).isBefore(dayjs())
     if (isStartsDateBeforeNow) {
-      return reply.status(400).send({ error: 'Invalid start date.' })
+      throw new ClientError('Invalid start date.')
     }
 
     const isEndsDateBeforeStartsDate = dayjs(endsAt).isBefore(startsAt)
     if (isEndsDateBeforeStartsDate) {
-      return reply.status(400).send({ error: 'Invalid end date.' })
+      throw new ClientError('Invalid end date.')
     }
 
     const trip = await prisma.trip.create({
@@ -60,7 +60,7 @@ export async function createTrip(app: FastifyInstance) {
     const formattedStartDate = dayjs(startsAt).format('LL')
     const formattedEndDate = dayjs(endsAt).format('LL')
 
-    const confirmationLink = `http://localhost:3030/trips/${trip.id}/confirm`
+    const confirmationLink = `${env.API_BASE_URL}/trips/${trip.id}/confirm`
 
     const mail = await getMailClient()
     const message = await mail.sendMail({
@@ -90,6 +90,6 @@ export async function createTrip(app: FastifyInstance) {
 
     console.log(nodemailer.getTestMessageUrl(message))
 
-    return reply.status(201).send({ tripId: trip.id })
+    return { tripId: trip.id }
   })
 }
