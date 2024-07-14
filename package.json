@@ -2,10 +2,11 @@
   "name": "planner-api",
   "version": "1.0.0",
   "description": "A travel planner",
-  "main": "index.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "tsx src/server.ts",
-    "dev": "tsx watch src/server.ts"
+    "build": "rm -rf ./dist && tsc",
+    "start": "node --env-file .env dist/server.js",
+    "dev": "tsx watch --env-file .env src/server.ts"
   },
   "repository": {
     "type": "git",
