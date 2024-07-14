@@ -54,7 +54,7 @@ export async function createActivity(app: FastifyInstance) {
         },
       })
 
-      return reply.status(201).send(activity)
+      return reply.status(201).send({ activityId: activity.id })
     },
   )
 }
